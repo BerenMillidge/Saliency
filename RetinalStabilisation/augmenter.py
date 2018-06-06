@@ -474,6 +474,31 @@ def augment_dataset_large_microsaccade(dataset, num_augments, microsaccade_min=4
 		np.save(save_name, augments)
 	return augments
 
+def large_microsaccade_or_copy(dataset, num_augments, microsaccade_min=4, microsaccade_max=9, microsaccade_prob = 0.1, microsaccade_vertical_prob=0.5,save_name=None):
+	if type(dataset) is str:
+		dataset = np.load(dataset)
+
+	augments = []
+	N = len(dataset)
+	for i in xrange(N):
+		item = dataset[i]
+		print "Item: " + str(i) + " of: " + str(N) + " complete"
+		for j in xrange(num_augments):
+			rand = int(np.random.uniform(low=0, high=1))
+			if rand<= microsaccade_prob:
+				#do microsaccade
+				translate = int(np.random.uniform(low=microsaccade_min, high=microsaccade_max))
+				aug = microsaccade_step(item, translate, microsaccade_vertical_prob)
+				augments.append(aug)
+			if rand > microsaccade_prob:
+				#copy instead
+				augments.append(item)
+
+	augments = np.array(augments)
+	if save_name is not None:
+		np.save(save_name, augments)
+	return augments
+
 
 
 
@@ -668,6 +693,12 @@ if __name__ == '__main__':
 	#drift_and_microsaccades(xtest, num_augments=10, microsaccade_prob=0.1, microsaccade_translate=8, mean_drift_translate=2, variance_drift_translate=1, microsaccade_vertical_prob=0.5, show=False, save_name='data/drift_and_microsaccades_test')
 
 	#augment with proper microsaccades
-	augment_dataset_large_microsaccade(xtrain, 10, save_name='data/proper_microsaccades_train')
+	#augment_dataset_large_microsaccade(xtrain, 10, save_name='data/proper_microsaccades_train')
 	#test
-	augment_dataset_large_microsaccade(xtest, 10, save_name='data/proper_microsaccades_test')
+	#augment_dataset_large_microsaccade(xtest, 10, save_name='data/proper_microsaccades_test')
+
+	#augment with only mirosaccades or copy
+	#train
+	large_microsaccade_or_copy(xtrain, 10, save_name='data/microsaccade_or_copy_train')
+	#test
+	large_microsaccade_or_copy(xtest, 10, save_name='data/microsaccade_or_copy_test')
