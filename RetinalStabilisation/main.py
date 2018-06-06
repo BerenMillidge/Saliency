@@ -318,7 +318,7 @@ if __name__ == '__main__':
 
 
 	#run the fixation experiments now!
-	#(xtrain, ytrain), (xtest, ytest) = mnist.load_data()
+	(xtrain, ytrain), (xtest, ytest) = mnist.load_data()
 	#print xtrain.shape
 	#print ytrain.shape
 	#print xtest.shape
@@ -387,7 +387,73 @@ if __name__ == '__main__':
 	#drift and microsaccades model
 	#run_mnist_model('data/drift_and_microsaccades_train.npy', 'data/drift_and_microsaccades_test.npy', save_name='results/drift_and_microsaccades_aug',epochs=30, batch_size=64, save_model_name='drift_and_microsaccades_model')
 	#copy model
-	run_mnist_model('data/mnist_dataset_train_copies.npy', 'data/mnist_dataset_test_copies.npy',save_name='results/drift_and_microsaccades_copy', epochs=30, batch_size=64, save_model_name='drift_and_microsaccades_copy_model')
+	#run_mnist_model('data/mnist_dataset_train_copies.npy', 'data/mnist_dataset_test_copies.npy',save_name='results/drift_and_microsaccades_copy', epochs=30, batch_size=64, save_model_name='drift_and_microsaccades_copy_model')
 
+
+	# okay, I'm coming bck to this after a long time - almost two months!! which is isnane! it's always bad to do this instead of just working on it consistently
+	# and I smoehow failed that and have been pretty unrpdocutive for two months. really I've been coasting on waht I achieved at the beginning
+	# of april for two months now... anyhow, I need to get this done!
+	# so, anyhow, what I need to do is to use the microsaccade step, see if that works
+	# and then do random drift
+	# also perhaps to achieve something... I don't really know waht!
+
+	# so essentialy, all the results are wrong... not sure if I shuold start blank slate with this or what
+	# the microsaccade condition... I can't remember that is, that's just small adjustments
+	# drift is different and doesn't work. then I need large conditions, and I don't know!
+	# the other trouble is that the mnist models are large and take ages to run, I wonder if I can
+	# reduce them somewhat...? esp. since the amount of data is vast... also should not be shuffled
+	# I think I just need to redo all the experiments for this!
+
+	# Ideally I would be able to set this working, and then just run it on the edinburgh server
+	# which I think will be the answer to this
+	# and have it run on a whole bunch of them... or just run it on mine... I don't know
+	# but I need to have it fast and it'll probably take me a week to reget this data!
 
 	#normalise data
+	# okay, so the thing to do now is to recreate all the data
+	# fundamentally, what I need is as follows:
+	#microsaccades and drifts - i.e. fixational eye movements vs copying - show superiority of that
+	# then split microsaccades vs copying
+	# then drifts vs copying
+	# for all of them (or only first) show increases of spatial invariances across pixels
+	# that's four different graphs I fundamentally need. the rest is commentary and unnecessary
+	# let's go get this!
+
+	# those are the steps I need to do. the rest if obviously commentary... but what is it?
+	# so  Ithink I just have the drift model
+
+	# okay, let's do this once and for al to get all the models I need to run
+
+	#create train
+	#random_walk_drift(xtrain, num_augments=10, mean_px_translate=2, variance_px_translate=1, save_name='data/random_walk_drift_train', show=False)
+	#test
+	#random_walk_drift(xtest, num_augments=10, mean_px_translate=2, variance_px_translate=1, save_name='data/random_walk_drift_test', show=False)
+
+	#now that the drifts have been created, it'stime to create the melange
+	#train
+	#drift_and_microsaccades(xtrain, num_augments=10, microsaccade_prob=0.1, microsaccade_translate=8, mean_drift_translate=2, variance_drift_translate=1, microsaccade_vertical_prob=0.5, show=False, save_name='data/drift_and_microsaccades_train')
+	#test
+	#drift_and_microsaccades(xtest, num_augments=10, microsaccade_prob=0.1, microsaccade_translate=8, mean_drift_translate=2, variance_drift_translate=1, microsaccade_vertical_prob=0.5, show=False, save_name='data/drift_and_microsaccades_test')
+
+	#augment with proper microsaccades
+	#augment_dataset_large_microsaccade(xtrain, 10, save_name='data/proper_microsaccades_train')
+	#test
+	#augment_dataset_large_microsaccade(xtest, 10, save_name='data/proper_microsaccades_test')
+
+	#augment with only mirosaccades or copy
+	#train
+	#large_microsaccade_or_copy(xtrain, 10, save_name='data/microsaccade_or_copy_train')
+	#test
+	#large_microsaccade_or_copy(xtest, 10, save_name='data/microsaccade_or_copy_test')
+
+	#drift and microsaccades model
+	#run_mnist_model('data/drift_and_microsaccades_train.npy', 'data/drift_and_microsaccades_test.npy', save_name='results/drift_and_microsaccades_aug',epochs=30, batch_size=64, save_model_name='drift_and_microsaccades_model')
+	run_mnist_model('data/drift_and_microsaccades_train.npy', 'data/drift_and_microsaccades_test.npy', save_name='new_results/drift_and_microsaccades_aug', epochs=1, batch_size=64, save_model_name='models/drift_and_microsaccades_model')
+	#drift only model
+	run_mnist_model('data/random_walk_drift_train.npy','data/random_walk_drift_test.npy', save_name='new_results/random_walk_drift_aug',epochs=1, batch_size=64, save_model_name='models/random_walk_drift_model')
+	# saccades only model
+	run_mnist_model('data/microsaccade_or_copy_train','microsaccade_or_copy_test',save_name='new_results/microsaccade_or_copy_aug', epochs=1, batch_size=64, save_model_name='models/microsaccade_or_copy_model')
+	# copy model
+	run_mnist_model('data/mnist_dataset_train_copies.npy', 'data/mnist_dataset_test_copies.npy',save_name='new_results/copy_aug', epochs=1, batch_size=64, save_model_name='models/copy_model')
+
+	# okay, this is all I need. Once this is run, it will be sufficient to obtain all the results I need for this paper... so hopefully it will work!
