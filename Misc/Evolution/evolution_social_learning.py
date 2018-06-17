@@ -18,20 +18,26 @@
 # which is the key thing - and the learning readiness which is sampled from a normal distribution centered
 # around the current normal distribution and those more likely to learn will generally have the trait
 
+#okay, so the general results work quickly but it doesn't explain why social learning is so poor at evolving
+# considering here even with uniparental transmission, social learning fidelity emerges incredibly quickly
+# which is just funny
+# but in any case, this emerges even when social learning itself has negative payoff, which is weird!
+
+from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 
 #general parameters
-no_trait_mean = 1
+no_trait_mean = 1.4
 no_trait_variance=1
 
-trait_mean = 1.5
+trait_mean = 1.41
 trait_variance = 1
 
 initial_learnability = 0.5
 learnability_variance = 0.5
 
-initial_trait_probability = 0.4
+initial_trait_probability = 0.1
 
 initial_population_number = 100000
 
@@ -53,7 +59,7 @@ def generate_initial_population(N, initial_trait_probability):
 		rand = uniform()
 		if rand <= initial_trait_probability:
 			init_pop.append([1, initial_learnability])
-		else:
+		if rand > initial_trait_probability:
 			init_pop.append([0, initial_learnability])
 	return init_pop
 
@@ -89,16 +95,28 @@ def get_trait_prevalence(pops):
 	prevalences = []
 	variances  = []
 	for i in xrange(len(pops)):
-		prevalences.append(np.mean(pops[i][0]))
+		num = 0
+		pop = pops[i]
+		for indiv in pop:
+			trait, learn = indiv
+			num+=trait
+		print num/len(pop)
+		prevalences.append(num/len(pop))
+
 		variances.append(np.var(pops[i][0]))
 	return prevalences, variances
 
 def get_learnabilities_prevalences(pops):
 	prevalences = []
 	variances  = []
-	for i in xrange(len(pops)):
-		prevalences.append(np.mean(pops[i][1]))
-		variances.append(np.var(pops[i][1]))
+	for pop in pops:
+		learns = 0
+		for indiv in pop:
+			trait, learn = indiv
+			learns += learn
+		print learns/len(pop)
+		prevalences.append(learns/len(pop))
+
 	return prevalences, variances
 
 def plot_prevalences(prevalences):
@@ -109,7 +127,7 @@ def plot_prevalences(prevalences):
 #now run it to see what happens
 
 if __name__ == '__main__':
-	pops = run_evolution(100, 100000)
+	pops = run_evolution(50, 100000)
 	tprevs, tvars = get_trait_prevalence(pops)
 	lprevs, lvars = get_learnabilities_prevalences(pops)
 	plot_prevalences(tprevs)
