@@ -19,6 +19,7 @@
 # around the current normal distribution and those more likely to learn will generally have the trait
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 #general parameters
 no_trait_mean = 1
@@ -68,6 +69,7 @@ def evolve_generation(pop_list):
 		for i in xrange(num_offspring):
 			new_learnability = positive_normal(orig_learnability, learnability_variance)
 			new_gen.append([trait, new_learnability])
+	print "new generation population: " + str(len(new_gen))
 	return new_gen
 
 #this is actually an incredibly simple solution which is just crazy who easy it is to make an 'agent' based model of how it works!
@@ -77,6 +79,7 @@ def run_evolution(N, initial_size):
 	pops.append(init_pop)
 	#now run the main experiment
 	for i in xrange(N):
+		print "generation: " + str(i) + " evolved"
 		#run the experiment
 		pops.append(evolve_generation(pops[i])) # I think this will work
 	return pops
@@ -98,10 +101,23 @@ def get_learnabilities_prevalences(pops):
 		variances.append(np.var(pops[i][1]))
 	return prevalences, variances
 
+def plot_prevalences(prevalences):
+	plt.plot(prevalences)
+	plt.show()
 
 
 #now run it to see what happens
 
 if __name__ == '__main__':
-	
+	pops = run_evolution(100, 100000)
+	tprevs, tvars = get_trait_prevalence(pops)
+	lprevs, lvars = get_learnabilities_prevalences(pops)
+	plot_prevalences(tprevs)
+	plot_prevalences(lprevs)
+
+#it's amazing that this seems to work so straightforwardly, and its pretty crazy
+## and total uniparental transform, so who knows if it actually learns
+# that's quite cool,  but who knows
+# assuming social learning can itself evolve successfully
+# that's pretty amazing, so who knows?
 
