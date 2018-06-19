@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from utils import *
 
-#plot bar chart of the average two errors
 
 def plot_training_loss(aug_losses,copy_losses):
 	aug_losses = np.load(aug_losses)
@@ -61,9 +60,6 @@ def average_error_bar_chart(save_name):
 	plt.show()
 	return fig
 
-#okay, I need to plot all the fixations on oen graph to see what's up, hopefully it will work
-#plot 12 for the fading and 12 for the non fading?
-
 def plot_graph_loop(imgs, num_rows, imgs_per_row, item_label, cmap='gray'):
 	if len(imgs)< num_rows*imgs_per_row:
 		raise ValueError('Not enough images supplied for graphing')
@@ -82,30 +78,16 @@ def plot_graph_loop(imgs, num_rows, imgs_per_row, item_label, cmap='gray'):
 			plt.title('Epoch: ' + str(epoch), fontsize=7)
 			plt.xticks([])
 			plt.yticks([])
-			#first time my graphing plotting logic worked! that's awesome!!
-			# even though I'm clumsy and forgetful in some things
-			# that's objectively quite difficult logic and i did okay,
-			# so hopefully my brain damage isn't quite that severe
-			# even though I'm having werid amounts of problems typgin
-			# which is fair enough I don't even know... the results seem to work okay which is great
 
-	#I just can't think properly, dagnabbit, and I feel sick. ugh, I'm really struggling with this
-	# and I'm just fighting against carbon monoxide poisoning /brian damage... argh!
 	plt.suptitle('Prediction errors of ' + item_label +' condition being fixated over time', fontsize=11)
 	fig.subplots_adjust(top=0.2,wspace=0.1, left=0.1)
 	fig.tight_layout()
 	plt.show()
 	return fig
 
-	#who knew this was so horrendously difficlt just to get the requisite plots. 
-	# I also need to do the data analysis of the drift results
-	# and then write the whole discussion and conclusion, why isthi so difficult
-	 #
-
 
 def plot_12_fixation_errmaps_one_graph_both(fixation_results_augments, fixation_results_copy,N=None, save_name =None):
-	#not totally sure what the point of N is, but hey, I think it's so we can see them all, let's try it out
-
+	
 	if N is None:
 		N = len(fixation_results_augments)
 
@@ -115,13 +97,10 @@ def plot_12_fixation_errmaps_one_graph_both(fixation_results_augments, fixation_
 	if type(fixation_results_copy) is str:
 		fixation_results_copy = load(fixation_results_copy)
 
-	#this is the sort of careless stupidity which could be caused by brain damage argh!
 	if len(fixation_results_copy)!=len(fixation_results_augments):
 		raise ValueError('Copies and augments should have same length: Augments Length:' + str(len(fixation_results_augments)) + ' Copies length: ' +str(len(fixation_results_copy)))
 
 
-		#this is the sort of other stupid mistakes caused by my weird feelin headache and brain damage... dagnabbit
-		# I would never have made that mistake before. I don't know what is wrong with me
 	print type(fixation_results_copy)
 	print len(fixation_results_copy)
 	print type(fixation_results_augments)
@@ -236,11 +215,6 @@ def plot_fixation_errmaps(fixation_results_augments, fixation_results_copy, N = 
 		plt.title('Concatenated')
 		plt.show()
 
-		# the trouble with this is that it decreases too fast
-		# so I'm going to doa single epoch instead this time in the hope of a better success there
-		# to see it actually dissapearing out from epochs, so that's the hope!
-		# hopefully it will work that
-
 def plot_generative_invariance_bar_chart(base_fname):
 	aug_errs = np.load(base_fname+'_aug.npy')
 	copy_errs = np.load(base_fname+'_copy.npy')
@@ -354,16 +328,11 @@ if __name__=='__main__':
 	#average_error_bar_chart('errors_1')
 	#plot_generative_invariance_bar_chart('results/generative_invariance')
 	#plot_discriminative_invariance_bar_chart('results/discriminative_invariance_2')
-	plot_12_fixation_errmaps_one_graph_both('results/from_scratch_fixation_augments', 'results/from_scratch_fixation_copy')
-	# if copy performs better in the copy position, could argue as to why suppressed
-	# but they may not even be suppressed and whether that is the case is doubtful
-	# but it would be a good explanation for why it occurs, why it would be useful
-	# or wahtever, but they don't sem to be random but instead modulated by task demands.
+	#plot_12_fixation_errmaps_one_graph_both('results/from_scratch_fixation_augments', 'results/from_scratch_fixation_copy')
+
 
 	#average_error_bar_chart('drift_errors_1')
-	# so this did not work precisely as hoped, the resulst are strange, error decreases(!)
-	# further from the original image. not sure what is going there
-	# I think I'm going to have to train the discriminative network instead
-	# and hope that that works better. I should look into doing that now
-	# as it won't be at all difficult most likely, so let's look into doing that
-	# while I read the papers necessary or whatever!
+	#plot_generative_invariance_bar_chart('results/drift_invariance')
+
+	#plot_generative_invariance_bar_chart('new_results/accuracies/microsaccade_or_copy_crossval_accuracies')
+	average_error_bar_chart('new_results/errors/random_walk_drift_errors')
