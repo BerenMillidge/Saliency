@@ -1,6 +1,3 @@
-#this is where the results are calculated before plotting
-#not sure it is totaly needed to be honest, but could be a useful separation of concerns
-
 from __future__ import division
 import numpy as np 
 import scipy
@@ -38,9 +35,6 @@ def calculate_average_error(augments_name, copies_name, save_name=None):
 		
 	return augment_error, copy_error
 
-	# the results work, it is much more successful with data augmentation
-	# that is good!
-
 
 #results: 
 #mnist augments error:  0.0458422217494
@@ -58,19 +52,6 @@ def calculate_average_error(augments_name, copies_name, save_name=None):
 #8: 0.0083, 0.0060
 #9: 0.0081, 0.0058
 #10: 0.0079, 0.0057
-
-# not sure about the augments, I've either got to find this or reprint it
-
-
-
-#I'll need something that will be able to calcualte the training curves
-# from the histories
-# and then obviously load the models and continue training
-# so that it is possible to see the dissapearing prediction errors
-#which is just the error maps
-#which could be interesting!
-
-# okay, aim to test here how things are
 
 def save_history_losses(his_fname, save_fname):
 	his = load(his_fname)
@@ -284,16 +265,21 @@ def split_cross_validate_invariance_accuracies(aug_model, copy_model, num_splits
 			d = data[i*split_length:(j+1)*split_length]
 			l = labels[i*split_length:(j+1)*split_length]
 			sh = d.shape
-			d = np.reshape(data, (sh[0],sh[1],sh[2],1))
+			d = np.reshape(d, (sh[0],sh[1],sh[2],1))
 
 			#reshape labels
 			l = one_hot(l)
 			#predict
 			aug_pred_labels = aug_model.predict(d)
 			copy_pred_labels = copy_model.predict(d)
+			# this  is just totally rubbish since it is discriminative
+			# but I don't want discriminative I want generative. I can't relaly be bothered
+			# to figure this out now!
 			print "predictions"
 			print aug_pred_labels.shape
 			#just get teh accuracies and save it
+			print l.shape
+			print aug_pred_labels.shape
 			aug_acc = classification_accuracy(l, aug_pred_labels)
 			copy_acc = classification_accuracy(l, copy_pred_labels)
 
@@ -348,32 +334,15 @@ if __name__ == '__main__':
 
 	#begin with the drift!
 	#calculate_average_error('results/drift_aug', 'results/drift_copy', save_name='drift_errors_1')
-	#calculate the drift invariances
-	# this network hasn't been trained for as long, so I'll need to rewrite the discussion to accoutn for that
-	# and figure uot how to get good graphs from matplotlib, so I honestly do not know... argh!
-	#test_generative_invariance('drift_model', 'drift_copy_model','results/drift_invariance')
 
-	# so for some reason, even though the validation and test errors are barely different
-	# this is not the case for the error maps where there is a significantand consistent difference
-	# in exactly the directoin I want, whic his good. Now that's the main results I need
-	# all I will need to do then is to show it's superiority on a standard not reconstruction test
-	# but on actual classification tasks, which should be easy, and interesting
-	# as well as greater difference there
-	# and also show the dissapearance of the error map - i.e. retinal stabilisation over time
-	# so hopefully that should be fairly straightforward and with those results, I can begin a proper writeup
-	# and have that to richard by the end of this week, which could be interesting#
-	# so yeah, that would be good, and test classification
-
-	# oh yes, with the new thing it actually dissapears over tiem
-	# that's really fantastic, I just need some good way to present them to Richard and for the paper
-	# the other results work out vaguely okay, I think, so that is nice,
-	# I also obviously need the graphs of somethign else, so that is cool also,
-	#yay!
-
-
-	# okay, I'm going to try to actually plot some data see if anything useful comes up
-	# some exlporatory data analysis on what has already been done!
-	split_cross_validate_invariance_accuracies('model_mnist_augments','model_mnist_copy',num_splits=10, results_save='results/invariance_splits_test', plot=True)
+	#let's find and cross-validate the accuracies first:
+	#test_generative_invariance('models/microsaccade_or_copy_model', 'models/copy_model',results_save='new_results/accuracies/microsaccade_or_copy_crossval_accuracies')
+	#test_generative_invariance('models/drift_and_microsaccades_model', 'models/copy_model',  results_save='new_results/accuracies/microsaccade_and_drift_crossval_accuracies')
+	#test_generative_invariance('models/random_walk_drift_model', 'models/copy_model',results_save='new_results/accuracies/drift_random_walk_crossval_accuracies')
 
 
 
+	#now for the standard errors!
+	calculate_average_error('new_results/microsaccade_or_copy_aug','new_results/copy_aug', save_name='new_results/errors/microsaccade_or_copy_errors')
+	calculate_average_error('new_results/drift_and_microsaccades_aug','new_results/copy_aug', save_name='new_results/errors/drift_and_microsaccade_errors')
+	calculate_average_error('new_results/random_walk_drift_aug','new_results/copy_aug', save_name='new_results/errors/random_walk_drift_errors')
