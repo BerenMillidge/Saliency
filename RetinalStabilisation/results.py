@@ -518,6 +518,64 @@ def crossvalidate_average_errors(augments_name, copies_name, num_split, split_si
 
 # so this is one crossvalidation function... what about others!?
 
+def crossvalidate_generative_invariance(aug_model, copy_model, num_splits, split_length, save_name=None):
+	aug_model = load_model(aug_model)
+	copy_model = load_model(copy_model)
+
+	crosses = []
+	mnist_0px = np.load('data/mnist_invariance_0pixels_translate.npy')[:,:,:] # make the problem managable!
+	mnist_2px = np.load('data/mnist_invariance_2pixels_translate.npy')[:,:,:]
+	mnist_4px = np.load('data/mnist_invariance_4pixels_translate.npy')[:,:,:]
+	mnist_6px = np.load('data/mnist_invariance_6pixels_translate.npy')[:,:,:]
+	mnist_8px = np.load('data/mnist_invariance_8pixels_translate.npy')[:,:,:]
+	invariances = [mnist_0px,mnist_2px,mnist_4px,mnist_6px,mnist_8px]
+
+	def get_invariances(invar_list, rand):
+		il = []
+		for invar in invarlist:
+			il.append(invar[rand: rand+split_length])
+		return il
+
+
+	l = len(mnist_0px)
+	# so I'm going to have a list where each element is a list of two other lists... yay!
+	for i in xrange(num_splits):
+		# get the rand
+		rand = l
+		while rand < l - split_length:
+			rand = l * np.random.uniform(low=0, high=1)
+		invariance_list = get_invariances(invariances, rand)
+		aug_errors = []
+		copy_errors = []
+		for i in xrange(len(invariance_list)):
+			invariance = invariance[i]
+			invariance = invariance.astype('float64')/255.
+			sh = invariance.shape
+			invariance = np.reshape(invariance, (sh[0], sh[1], sh[2],1))
+
+			aug_preds = aug_model.predict(invariance)
+			copy_preds = copy_model.predict(invariance)
+			s = aug_preds.shape
+	#
+
+			aug_errmaps = get_error_maps(invariance, aug_preds)
+			copy_errmaps = get_error_maps(invariance, copy_preds)
+		
+			aug_mean_error = get_mean_error(aug_errmaps)
+			copy_mean_error = get_mean_error(copy_errmaps)
+			aug_errors.append(aug_mean_error)
+
+		aug_errors = np.array(aug_errors)
+		copy_errors = np.array(copy_errors)
+		l.append([aug_errors, copy_errors])
+
+	if save_name is not None:
+		save_array(l, save_name)
+	return l
+
+# these functions should hopefully give the ability to do statistics at least o nthe crossvalidated data
+# if not the actual multiple models... so who knows?
+
 
 #and some quick tests
 if __name__ == '__main__':
