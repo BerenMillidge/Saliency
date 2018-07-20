@@ -596,6 +596,16 @@ def levyFlightDrift(dataset, num_augments, alpha, vertical_prob, save_name=None,
 
 	return augments
 
+def create_augment_dataset(dataset, num_augments, save_name):
+	# I can't believe this iasn't been done already... god knows where I did it?
+	copies = augment_with_copy(dataset[0], num_augments)
+	for i in xrange(len(dataset)-1):
+		copy = augment_with_copy(dataset[i+1], num_augments)
+		copies = np.concatenate((copies, copy))
+	#copies = np.array(copies)
+	np.save(save_name, copies)
+	return copies
+
 
 
 
@@ -699,6 +709,15 @@ if __name__ == '__main__':
 
 	#augment with only mirosaccades or copy
 	#train
-	large_microsaccade_or_copy(xtrain, 10, save_name='data/microsaccade_or_copy_train')
+	#large_microsaccade_or_copy(xtrain, 10, save_name='data/microsaccade_or_copy_train')
 	#test
-	large_microsaccade_or_copy(xtest, 10, save_name='data/microsaccade_or_copy_test')
+	#large_microsaccade_or_copy(xtest, 10, save_name='data/microsaccade_or_copy_test')
+
+	#augment with copy again
+	ctrain = create_augment_dataset(xtrain, num_augments=10, save_name='data/copies_train')
+	ctest = create_augment_dataset(xtest, num_augments=10, save_name='data/copies_test')
+	print ctrain.shape
+	print ctest.shape
+
+	#def augment_with_copy(img, num_augments=10, copy=False):
+	
