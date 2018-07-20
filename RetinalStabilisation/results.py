@@ -52,9 +52,9 @@ def calculate_average_error_from_models(augments_name, copies_name, augments_mod
 	#augment_preds = np.load(augments_name+'_preds.npy')
 	# else assume it is augments
 	else:
-		augments_test = augments_name
+		augment_test = augments_name
 
-	print augment_test.shape
+	#print augment_test.shape
 	#print augment_preds.shape
 
 	if isinstance(copies_name, str):
@@ -481,11 +481,11 @@ def crossvalidate_average_errors(augments_name, copies_name, num_split, split_si
 	#just assume everything is fine and load it!
 	aug_train = np.load(augments_name + '_train.npy')
 	aug_test = np.load(augments_name + '_test.npy')
-	copy_train = np.load(copies_name + '_train_copies.npy')
-	copy_test = np.load(copies_name + '_test_copies.npy')
+	copy_train = np.load(copies_name + '_train.npy')
+	copy_test = np.load(copies_name + '_test.npy')
 
 	aug_data = np.concatenate((aug_train, aug_test))
-	copy_data = np.concatenate((copy_train, copy_train))
+	copy_data = np.concatenate((copy_train, copy_test))
 	print aug_data.shape
 	print copy_data.shape
 
@@ -495,14 +495,23 @@ def crossvalidate_average_errors(augments_name, copies_name, num_split, split_si
 	augerrs = []
 	copyerrs = []
 	for i in xrange(num_split):
+		split_size = int(split_size)
 		#generate the random number
 		rand = l
-		while rand < l - split_size:
-			rand = l * np.random.uniform(low=0, high=1)
+		valid = False
+		while valid is False:
+			rand = int(l * np.random.uniform(low=0, high=1))
+			print "in while loop", rand
+			if rand < l - split_size:
+				valid=True
 
 		# okay, got correct rand
-		aug_dat = aug_data[rand:rand+split_size]
-		copy_dat = copy_data[rand:rand+split_size]
+		aug_dat = np.reshape(aug_data[rand:rand+split_size], (split_size, 28,28,1))
+		copy_dat = np.reshape(copy_data[rand:rand+split_size], (split_size, 28,28,1))
+		print rand
+		print split_size
+		print aug_dat.shape
+		print copy_dat.shape
 		aug_err, copy_err = calculate_average_error_from_models(aug_dat, copy_dat, augment_model, copy_model)
 		augerrs.append(aug_err)
 		copyerrs.append(copy_err)
@@ -628,17 +637,22 @@ if __name__ == '__main__':
 	# and needs to get sorted... I have made a lot of progress with R though and looking at the underlying dataset graph
 	# so that's good!d
 
-	#tr = np.load('data/mnist_dataset_train_copies.npy')
-	#te = np.load('data/mnist_dataset_test_copies.npy')
-	#print tr.shape 
-	#print te.shape
+	tr = np.load('data/microsaccade_or_copy_train.npy')
+	te = np.load('data/microsaccade_or_copy_test.npy')
+	print tr.shape 
+	print te.shape
+
+	tr = np.load('data/mnist_dataset_train_copies.npy')
+	te = np.load('data/mnist_dataset_test_copies.npy')
+	print tr.shape 
+	print te.shape
 
 	#microsaccade errors
-	crossvalidate_average_errors('data/microsaccade_or_copy', 'data/mnist_dataset', 20, 100000, 'models/microsaccade_or_copy_model', 'models/copy_model','new_results/crossval/microsaccade_averages')
+	crossvalidate_average_errors('data/microsaccade_or_copy', 'data/copies', 20, 100000, 'models/microsaccade_or_copy_model', 'models/copy_model','new_results/crossval/microsaccade_averages')
 	#drift errors
-	crossvalidate_average_errors('data/random_walk_drift', 'data/mnist_dataset', 20, 100000, 'models/random_walk_drift_model', 'models/copy_model','new_results/crossval/drift_averages')
+	crossvalidate_average_errors('data/random_walk_drift', 'data/copies', 20, 100000, 'models/random_walk_drift_model', 'models/copy_model','new_results/crossval/drift_averages')
 	#microsaccade and drift
-	crossvalidate_average_errors('data/drift_and_microsaccades', 'data/mnist_dataset', 20, 100000, 'models/drift_and_microsaccades_model', 'models/copy_model','new_results/crossval/microsaccade_and_drift_averages')
+	crossvalidate_average_errors('data/drift_and_microsaccades', 'data/copies', 20, 100000, 'models/drift_and_microsaccades_model', 'models/copy_model','new_results/crossval/microsaccade_and_drift_averages')
 	#let's figure out the invariances crossval too!
 	#microsaccade
 	crossvalidate_generative_invariance('models/microsaccade_or_copy_model', 'models/copy_model', 20, 100000, 'new_results/crossval/microsaccade_invariance')
