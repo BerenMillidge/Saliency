@@ -481,8 +481,8 @@ def crossvalidate_average_errors(augments_name, copies_name, num_split, split_si
 	#just assume everything is fine and load it!
 	aug_train = np.load(augments_name + '_train.npy')
 	aug_test = np.load(augments_name + '_test.npy')
-	copy_train = np.load(augments_name + '_train.npy')
-	copy_test = np.load(augments_name _+ '_test.npy')
+	copy_train = np.load(copies_name + '_train_copies.npy')
+	copy_test = np.load(copies_name + '_test_copies.npy')
 
 	aug_data = np.concatenate((aug_train, aug_test))
 	copy_data = np.concatenate((copy_train, copy_train))
@@ -607,13 +607,10 @@ if __name__ == '__main__':
 	#calculate_average_error('new_results/drift_and_microsaccades_aug','new_results/copy_aug', save_name='new_results/errors/drift_and_microsaccade_errors')
 	#calculate_average_error('new_results/random_walk_drift_aug','new_results/copy_aug', save_name='new_results/errors/random_walk_drift_errors')
 
-	# I am pretty scared... if this doesn'twork them I'm fairly doomed as I'll ahve no paper to actually read/write
-	# which certainly isn't ideal. having three papers by the end of the first year at minimum isn't best!
-
 	#compare_test_sets('new_results/copy_aug_test.npy', 'new_results/drift_and_microsaccades_aug_test.npy',50)
-	calculate_average_error_from_models('new_results/drift_and_microsaccades_aug','new_results/copy_aug','models/drift_and_microsaccades_model','models/copy_model', save_name='new_results/model_averages/drift_and_microsaccades_proper')
-	calculate_average_error_from_models('new_results/microsaccade_or_copy_aug','new_results/copy_aug','models/microsaccade_or_copy_model','models/copy_model', save_name='new_results/model_averages/microsaccade_or_copy_proper')
-	calculate_average_error_from_models('new_results/random_walk_drift_aug','new_results/copy_aug','models/random_walk_drift_model','models/copy_model', save_name='new_results/model_averages/random_walk_drift_proper')
+	#calculate_average_error_from_models('new_results/drift_and_microsaccades_aug','new_results/copy_aug','models/drift_and_microsaccades_model','models/copy_model', save_name='new_results/model_averages/drift_and_microsaccades_proper')
+	#calculate_average_error_from_models('new_results/microsaccade_or_copy_aug','new_results/copy_aug','models/microsaccade_or_copy_model','models/copy_model', save_name='new_results/model_averages/microsaccade_or_copy_proper')
+	#calculate_average_error_from_models('new_results/random_walk_drift_aug','new_results/copy_aug','models/random_walk_drift_model','models/copy_model', save_name='new_results/model_averages/random_walk_drift_proper')
 	# I now changed this ot calculate the errors of the copy model wrt the agument datasets, which seems reasonable!
 
 	# okay, while that is running let's dothe survey I've been procrastinating out of for ages!
@@ -625,3 +622,31 @@ if __name__ == '__main__':
 	# as I don' think I'm going to realistically end up doing any library work tonight
 	# at least not immediately, I should just work on getting a cross validator together
 	# to try ou tvarious things!
+
+	# okay, let's run the crossvalidated errors and accuracies... get that sorted before heading out and 
+	# going for the PP library, which I haven't really done anything on this week... so that's rally bad
+	# and needs to get sorted... I have made a lot of progress with R though and looking at the underlying dataset graph
+	# so that's good!d
+
+	#tr = np.load('data/mnist_dataset_train_copies.npy')
+	#te = np.load('data/mnist_dataset_test_copies.npy')
+	#print tr.shape 
+	#print te.shape
+
+	#microsaccade errors
+	crossvalidate_average_errors('data/microsaccade_or_copy', 'data/mnist_dataset', 20, 100000, 'models/microsaccade_or_copy_model', 'models/copy_model','new_results/crossval/microsaccade_averages')
+	#drift errors
+	crossvalidate_average_errors('data/random_walk_drift', 'data/mnist_dataset', 20, 100000, 'models/random_walk_drift_model', 'models/copy_model','new_results/crossval/drift_averages')
+	#microsaccade and drift
+	crossvalidate_average_errors('data/drift_and_microsaccades', 'data/mnist_dataset', 20, 100000, 'models/drift_and_microsaccades_model', 'models/copy_model','new_results/crossval/microsaccade_and_drift_averages')
+	#let's figure out the invariances crossval too!
+	#microsaccade
+	crossvalidate_generative_invariance('models/microsaccade_or_copy_model', 'models/copy_model', 20, 100000, 'new_results/crossval/microsaccade_invariance')
+	#drift
+	crossvalidate_generative_invariance('models/random_walk_drift_model', 'models/copy_model', 20, 100000, 'new_results/crossval/drift_invariance')
+	#microsaccade and drift
+	crossvalidate_generative_invariance('models/drift_and_microsaccades_model', 'models/copy_model', 20, 100000, 'new_results/crossval/microsaccade_and_drift_invariance')
+	#crossvalidate_average_errors(augments_name, copies_name, num_split, split_size, augment_model, copy_model, save_name):
+	# crossvalidate_generative_invariance(aug_model, copy_model, num_splits, split_length, save_name=None):
+	#let's just have a test set of 100000 images
+	# okay.. done! let's get this running!
