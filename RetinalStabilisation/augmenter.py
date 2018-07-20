@@ -602,6 +602,7 @@ def create_augment_dataset(dataset, num_augments, save_name):
 	for i in xrange(len(dataset)-1):
 		copy = augment_with_copy(dataset[i+1], num_augments)
 		copies = np.concatenate((copies, copy))
+		print copies.shape
 	#copies = np.array(copies)
 	np.save(save_name, copies)
 	return copies
@@ -714,8 +715,8 @@ if __name__ == '__main__':
 	#large_microsaccade_or_copy(xtest, 10, save_name='data/microsaccade_or_copy_test')
 
 	#augment with copy again
-	ctrain = create_augment_dataset(xtrain, num_augments=10, save_name='data/copies_train')
-	ctest = create_augment_dataset(xtest, num_augments=10, save_name='data/copies_test')
+	ctrain = create_augment_dataset(xtrain, num_augments=9, save_name='data/copies_train')
+	ctest = create_augment_dataset(xtest, num_augments=9, save_name='data/copies_test')
 	print ctrain.shape
 	print ctest.shape
 
