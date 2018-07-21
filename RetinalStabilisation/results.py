@@ -541,7 +541,7 @@ def crossvalidate_generative_invariance(aug_model, copy_model, num_splits, split
 
 	def get_invariances(invar_list, rand):
 		il = []
-		for invar in invarlist:
+		for invar in invar_list:
 			il.append(invar[rand: rand+split_length])
 		return il
 
@@ -551,19 +551,28 @@ def crossvalidate_generative_invariance(aug_model, copy_model, num_splits, split
 	for i in xrange(num_splits):
 		# get the rand
 		rand = l
-		while rand < l - split_length:
-			rand = l * np.random.uniform(low=0, high=1)
+		valid = False
+		while valid is False:
+			rand = int(l * np.random.uniform(low=0, high=1))
+			print "in while loop " + str(rand) + " " + str(l - split_length)
+			if rand < l - split_length:
+				valid=True
 		invariance_list = get_invariances(invariances, rand)
 		aug_errors = []
 		copy_errors = []
 		for i in xrange(len(invariance_list)):
-			invariance = invariance[i]
+			invariance = invariance_list[i]
 			invariance = invariance.astype('float64')/255.
 			sh = invariance.shape
+			print sh
 			invariance = np.reshape(invariance, (sh[0], sh[1], sh[2],1))
+			print invariance.shape
 
 			aug_preds = aug_model.predict(invariance)
 			copy_preds = copy_model.predict(invariance)
+			print type(aug_preds)
+			print len(aug_preds)
+			print aug_preds
 			s = aug_preds.shape
 	#
 
@@ -637,8 +646,8 @@ if __name__ == '__main__':
 	# and needs to get sorted... I have made a lot of progress with R though and looking at the underlying dataset graph
 	# so that's good!d
 
-	tr = np.load('data/microsaccade_or_copy_train.npy')
-	te = np.load('data/microsaccade_or_copy_test.npy')
+	tr = np.load('data/drift_and_microsaccades_train.npy')
+	te = np.load('data/drift_and_microsaccades_test.npy')
 	print tr.shape 
 	print te.shape
 
@@ -647,20 +656,30 @@ if __name__ == '__main__':
 	print tr.shape 
 	print te.shape
 
+	# let's just solve this problem immediately... hopefully?
+	# in a hacky way
+	#driftmicrosaccades_train = np.load('data/drift_and_microsaccades2_train.npy')[0:660000]
+	#driftmicrosaccades_test = np.load('data/drift_and_microsaccades2_test.npy')[0:110000]
+	#np.save('data/drift_and_microsaccades3_train', driftmicrosaccades_train)
+	#np.save('data/drift_and_microsaccades3_test', driftmicrosaccades_test)
+
+
 	#microsaccade errors
-	crossvalidate_average_errors('data/microsaccade_or_copy', 'data/copies', 20, 100000, 'models/microsaccade_or_copy_model', 'models/copy_model','new_results/crossval/microsaccade_averages')
+	#crossvalidate_average_errors('data/microsaccade_or_copy', 'data/copies', 20, 100000, 'models/microsaccade_or_copy_model', 'models/copy_model','new_results/crossval/microsaccade_averages')
 	#drift errors
-	crossvalidate_average_errors('data/random_walk_drift', 'data/copies', 20, 100000, 'models/random_walk_drift_model', 'models/copy_model','new_results/crossval/drift_averages')
+	#crossvalidate_average_errors('data/random_walk_drift', 'data/copies2', 20, 100000, 'models/random_walk_drift_model', 'models/copy_model','new_results/crossval/drift_averages')
 	#microsaccade and drift
-	crossvalidate_average_errors('data/drift_and_microsaccades', 'data/copies', 20, 100000, 'models/drift_and_microsaccades_model', 'models/copy_model','new_results/crossval/microsaccade_and_drift_averages')
+	#crossvalidate_average_errors('data/drift_and_microsaccades3', 'data/copies2', 20, 100000, 'models/drift_and_microsaccades_model', 'models/copy_model','new_results/crossval/microsaccade_and_drift_averages')
 	#let's figure out the invariances crossval too!
 	#microsaccade
-	crossvalidate_generative_invariance('models/microsaccade_or_copy_model', 'models/copy_model', 20, 100000, 'new_results/crossval/microsaccade_invariance')
+	crossvalidate_generative_invariance('models/microsaccade_or_copy_model', 'models/copy_model', 20, 10000, 'new_results/crossval/microsaccade_invariance')
 	#drift
-	crossvalidate_generative_invariance('models/random_walk_drift_model', 'models/copy_model', 20, 100000, 'new_results/crossval/drift_invariance')
+	crossvalidate_generative_invariance('models/random_walk_drift_model', 'models/copy_model', 20, 10000, 'new_results/crossval/drift_invariance')
 	#microsaccade and drift
-	crossvalidate_generative_invariance('models/drift_and_microsaccades_model', 'models/copy_model', 20, 100000, 'new_results/crossval/microsaccade_and_drift_invariance')
+	crossvalidate_generative_invariance('models/drift_and_microsaccades_model', 'models/copy_model', 20, 10000, 'new_results/crossval/microsaccade_and_drift_invariance')
 	#crossvalidate_average_errors(augments_name, copies_name, num_split, split_size, augment_model, copy_model, save_name):
 	# crossvalidate_generative_invariance(aug_model, copy_model, num_splits, split_length, save_name=None):
 	#let's just have a test set of 100000 images
 	# okay.. done! let's get this running!
+	# I don't know why it doesn't do edge highlighting vs something actually useful... currently my version just does blurring
+	# which is annoying and I don't understand why!
